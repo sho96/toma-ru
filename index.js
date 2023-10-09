@@ -10,7 +10,6 @@ app.use(express.static("public"));
 httpServer = http.createServer(app);
 
 const socketServer = new webSocket.Server({ server: httpServer });
-const clients = [];
 
 socketServer.on("connection", (client) => {
     console.log("connected");
@@ -42,6 +41,9 @@ app.post("/brake", (req, resp) => {
         client.send("disconnect");
     })
 });
+app.get("/health", (req, resp) => {
+    resp.status(200).send("working!!");
+})
 
 
 httpServer.listen(httpPort, () => console.log(`Server has started listening on port ${httpPort}.`));
