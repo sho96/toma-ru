@@ -7,8 +7,9 @@
     <!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js"></script>!-->
     <title>Test</title>
 </head>
-<body>
+<body style="font-family: Arial;">
   <h1 id="ws-status">websocket...</h1>
+  <h3 id="socket-traffic"></h3>
     <img id="image" src="/room.png" alt="">
     <div id="liveView" class="videoView">
       <button id="webcamButton" class="mdc-button mdc-button--raised">
@@ -29,6 +30,8 @@ ws.addEventListener("open", (event) => {
 });
 ws.addEventListener("message", (event) => {
   console.log("fron server: ", event.data);
+  docuemnt.querySelector("#socket-traffic")
+  .innerHTML += `${event.data}<br>`;
 });
 
 let runningMode = "IMAGE";
@@ -71,7 +74,7 @@ async function enableCam(event) {
   // getUsermedia parameters
   const constraints = {
     video: {
-      facingMode: { exact: "environment" }
+      facingMode: "environment"
     },
   };
 
