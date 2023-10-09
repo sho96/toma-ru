@@ -32,7 +32,7 @@ ws.addEventListener("open", (event) => {
 });
 ws.addEventListener("message", (event) => {
   console.log("fron server: ", event.data);
-  docuemnt.querySelector("#socket-traffic")
+  document.querySelector("#socket-traffic")
   .innerHTML += `${event.data}<br>`;
 });
 
@@ -127,6 +127,10 @@ async function displayVideoDetections(detections){
     //fetch("/disconnect", {method: "POST"});
     ws.send("brake");
     ws.send("disconnect");
+    document.querySelector("#socket-traffic")
+  .innerHTML += `brake<br>`;
+  document.querySelector("#socket-traffic")
+  .innerHTML += `disconnect<br>`;
   }
 }
 
