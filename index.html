@@ -9,32 +9,57 @@
 </head>
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script>eruda.init();</script>
-<body style="font-family: Arial;">
+<body style="font-family: Arial; height: 200vh;">
   <h1 id="ws-status">websocket...</h1>
+  <img id="image" src="/room.png" alt="">
+  <div id="liveView" class="videoView">
+    <button id="webcamButton" class="mdc-button mdc-button--raised">
+      <span class="mdc-button__ripple"></span>
+      <span class="mdc-button__label">ENABLE WEBCAM</span>
+    </button>
+    <video id="webcam" autoplay playsinline></video>
+  </div>
+  <h1 id="detection"></h1>
   <h3 id="socket-traffic"></h3>
-    <img id="image" src="/room.png" alt="">
-    <div id="liveView" class="videoView">
-      <button id="webcamButton" class="mdc-button mdc-button--raised">
-        <span class="mdc-button__ripple"></span>
-        <span class="mdc-button__label">ENABLE WEBCAM</span>
-      </button>
-      <video id="webcam" autoplay playsinline></video>
-    </div>
-    <h1 id="detection"></h1>
 </body>
 <!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs" crossorigin="anonymous" type="module"></script>!-->
 
 <script type="module">
-const ws = new WebSocket("wss://toma-ru.onrender.com");
+//const ws = new WebSocket("wss://toma-ru.onrender.com");
+const ws = new WebSocket("ws://127.0.0.1:8000");
 ws.addEventListener("open", (event) => {
   console.log("connected to server by websocket");
   document.querySelector("#ws-status").innerHTML = "websocket connected!";
 });
 ws.addEventListener("message", (event) => {
-  console.log("fron server: ", event.data);
-  document.querySelector("#socket-traffic")
-  .innerHTML += `${event.data}<br>`;
+  if(event.data instanceof Blob){
+    const reader = new FileReader();
+
+    reader.onload = function() {
+      console.log('from server:', reader.result);
+      document.querySelector("#socket-traffic")
+      .innerHTML += `${reader.result}<br>`;
+    };
+    reader.onerror = function() {
+        console.error('FileReader error:', reader.error);
+    };
+    reader.readAsText(event.data)
+  }else{
+    console.log(`from server: ${event.data}`);
+    document.querySelector("#socket-traffic")
+    .innerHTML += `${event.data}<br>`;
+  }
+  handleLineLimit();
 });
+
+function handleLineLimit(){
+  const logElement = document.querySelector("#socket-traffic");
+  let lines = logElement.innerHTML.split("<br>");
+  if (lines.length > 5){
+    lines.shift();
+  }
+  logElement.innerHTML = lines.join("<br>");
+}
 
 let runningMode = "IMAGE";
 import {
@@ -127,10 +152,6 @@ async function displayVideoDetections(detections){
     //fetch("/disconnect", {method: "POST"});
     ws.send("brake");
     ws.send("disconnect");
-    document.querySelector("#socket-traffic")
-  .innerHTML += `brake<br>`;
-  document.querySelector("#socket-traffic")
-  .innerHTML += `disconnect<br>`;
   }
 }
 

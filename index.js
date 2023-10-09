@@ -18,9 +18,7 @@ socketServer.on("connection", (client) => {
     client.on("message", data => {
         console.log(`client: ${data}`);
         socketServer.clients.forEach(c => {
-            if(c != client){
-                c.send(data);
-            }
+            c.send(data);
         })
     })
     client.onerror = () => {
