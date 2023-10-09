@@ -17,6 +17,9 @@ socketServer.on("connection", (client) => {
     client.on("close", () => console.log("disconnected"));
     client.on("message", data => {
         console.log(`client: ${data}`);
+        socketServer.clients.forEach(c => {
+            c.send(data);
+        })
     })
     client.onerror = () => {
         console.log("error occurred with client");
@@ -30,16 +33,16 @@ app.get("/room.png", (request, response) => {
     response.status(200).send(readFileSync("./Red-Cup-1.jpg"));
 })
 app.post("/brake", (req, resp) => {
-    resp.status(200).send();
     socketServer.clients.forEach(client => {
         client.send("brake");
     })
-});
-app.post("/brake", (req, resp) => {
     resp.status(200).send();
+});
+app.post("/disconnect", (req, resp) => {
     socketServer.clients.forEach(client => {
         client.send("disconnect");
     })
+    resp.status(200).send();
 });
 app.get("/health", (req, resp) => {
     resp.status(200).send("working!!");

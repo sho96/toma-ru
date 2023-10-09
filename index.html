@@ -8,6 +8,7 @@
     <title>Test</title>
 </head>
 <body>
+  <h1 id="ws-status">websocket...</h1>
     <img id="image" src="/room.png" alt="">
     <div id="liveView" class="videoView">
       <button id="webcamButton" class="mdc-button mdc-button--raised">
@@ -21,6 +22,15 @@
 <!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs" crossorigin="anonymous" type="module"></script>!-->
 
 <script type="module">
+const ws = new WebSocket("wss://toma-ru.onrender.com");
+ws.addEventListener("open", (event) => {
+  console.log("connected to server by websocket");
+  document.querySelector("#ws-status").innerHTML = "websocket connected!";
+});
+ws.addEventListener("message", (event) => {
+  console.log("fron server: ", event.data);
+});
+
 let runningMode = "IMAGE";
 import {
   ObjectDetector,
@@ -106,8 +116,10 @@ async function displayVideoDetections(detections){
   }
   document.querySelector("#detection").innerHTML = strToShow;
   if(containsCar){
-    fetch("/brake", {method: "POST"});
-    fetch("/disconnect", {method: "POST"});
+    //fetch("/brake", {method: "POST"});
+    //fetch("/disconnect", {method: "POST"});
+    ws.send("brake");
+    ws.send("disconnect");
   }
 }
 
