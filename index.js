@@ -1,24 +1,10 @@
 const express = require("express");
 const { readFileSync } = require("fs");
 const webSocket = require("ws");
+const http = require("http");
 const app = express();
 const httpPort = process.env.PORT || 8000;  // Default to 8000 if no environment variable is set
-const wsPort = process.env.WEBSOCKET_PORT || 8080;
 
-const socketServer = new webSocket.Server({ port: wsPort });
-const clients = [];
-
-socketServer.on("connection", (client) => {
-    console.log("connected");
-    client.send("connected");
-    client.on("close", () => console.log("disconnected"));
-    client.on("message", data => {
-        console.log(`client: ${data}`);
-    })
-    client.onerror = () => {
-        console.log("error occurred with client");
-    }
-})
 
 app.use(express.static("public"));
 
@@ -41,4 +27,21 @@ app.post("/brake", (req, resp) => {
     })
 });
 
-app.listen(httpPort, () => console.log(`Server has started listening on port ${httpPort}.`));
+httpServer = http.createServer(app);
+
+httpServer.listen(httpPort, () => console.log(`Server has started listening on port ${httpPort}.`));
+
+const socketServer = new webSocket.Server({ httpServer });
+const clients = [];
+
+socketServer.on("connection", (client) => {
+    console.log("connected");
+    client.send("connected");
+    client.on("close", () => console.log("disconnected"));
+    client.on("message", data => {
+        console.log(`client: ${data}`);
+    })
+    client.onerror = () => {
+        console.log("error occurred with client");
+    }
+})
