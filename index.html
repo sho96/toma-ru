@@ -70,7 +70,9 @@ async function enableCam(event) {
 
   // getUsermedia parameters
   const constraints = {
-    video: true
+    video: {
+      facingMode: { exact: "environment" }
+    },
   };
 
   // Activate the webcam stream.
