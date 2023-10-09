@@ -3,7 +3,7 @@ const { readFileSync } = require("fs");
 const webSocket = require("ws");
 const app = express();
 const httpPort = process.env.PORT || 8000;  // Default to 8000 if no environment variable is set
-const wsPort = process.env.WS_PORT || 8080;
+const wsPort = process.env.WEBSOCKET_PORT || 8080;
 
 const socketServer = new webSocket.Server({ port: wsPort });
 const clients = [];
