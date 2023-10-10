@@ -26,7 +26,7 @@
 
 <script type="module">
 //const ws = new WebSocket("wss://toma-ru.onrender.com");
-const currentHtmlUrl = window.location.href.split("/").filter(part => part !== "")
+const currentHtmlUrl = window.location.href.split("/").filter(part => part !== "")[1]
 const ws = new WebSocket(`wss://${currentHtmlUrl}`);
 ws.addEventListener("open", (event) => {
   console.log("connected to server by websocket");
