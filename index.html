@@ -26,7 +26,8 @@
 
 <script type="module">
 //const ws = new WebSocket("wss://toma-ru.onrender.com");
-const ws = new WebSocket("ws://127.0.0.1:8000");
+const currentHtmlUrl = window.location.href.split("/").filter(part => part !== "")
+const ws = new WebSocket(`wss://${currentHtmlUrl}`);
 ws.addEventListener("open", (event) => {
   console.log("connected to server by websocket");
   document.querySelector("#ws-status").innerHTML = "websocket connected!";
