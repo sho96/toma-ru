@@ -22,8 +22,98 @@
   <h1 id="detection"></h1>
   <h3 id="socket-traffic"></h3>
 </body>
-<!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs" crossorigin="anonymous" type="module"></script>!-->
+<script>
+  let timeOfLastLocationUpdate = null;
+  let currentSpeed = 0; // current speed in km/h
+  let currentDirection = 0; // forward direction of the vehicle in clockwise direction from 0 deg being the north
+  let lastLocation;
+  let surroundingVehicles;
 
+  navigator.geolocation.watchPosition(
+    (location) => {
+      timeOfLocationUpdate = location.timestamp;
+      coords = location.coords;
+      lat = coords.lat;
+      lon = coords.lon;
+
+      if(timeOfLastLocationUpdate == null){
+        timeOfLastLocationUpdate = timeOfLocationUpdate;
+        return;
+      }
+
+      deltaTime = (timeOfLocationUpdate - timeOfLastLocationUpdate) / 1000; //delta time in seconds
+      deltaDistance = getDistanceOnEarth(lastLocation.lat, lastLocation.lon, lat, lon); // distance in km
+
+      currentSpeed = deltaDistance / deltaTime * 3600;
+      if(currentSpeed > 5){
+        currentDirection = calculateDirection(lastLocation.lat, lastLocation.lon, lat, lon);
+      }
+
+      lastLocation = coords;
+      sendLocationData();
+    }, 
+    (err) => {
+      console.log("error occurred while trying to access GPS location data");
+    }
+  )
+  function sendLocationData(){
+    fetch("/updateLocation", {
+      method: "POST",
+      body: JSON.stringify({
+        speed: currentSpeed,
+        direction: currentDirection,
+        timeOfUpdate: timeOfLastLocationUpdate,
+        position: {
+          lat: lastLocation.lat, lon: lastLocation.lon
+        }
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+  }
+  function getSurroundingLocationDatas(){
+    fetch(`/getLocations?lat=${lastLocation.lat}&lon=${lastLocation.lon}`)
+    .then((resp) => resp.json())
+    .then((data) => {
+      surroundingVehicles = data;
+    })
+  }
+  function getDistanceOnEarth(lat1,lon1,lat2,lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1); 
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    return d;
+  }
+  function calculateDirection(latitude1, longitude1, latitude2, longitude2) {
+    const toRadians = (degrees) => (degrees * Math.PI) / 180;
+    const toDegrees = (radians) => (radians * 180) / Math.PI;
+
+    const lat1 = toRadians(latitude1);
+    const lon1 = toRadians(longitude1);
+    const lat2 = toRadians(latitude2);
+    const lon2 = toRadians(longitude2);
+
+    const deltaLon = lon2 - lon1;
+
+    const y = Math.sin(deltaLon) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLon);
+    const initialBearing = Math.atan2(y, x);
+
+    // Convert bearing to degrees and make sure it's in the range [0, 360]
+    const degrees = (toDegrees(initialBearing) + 360) % 360;
+
+    return degrees;
+  }
+
+  //set interval of functions that needs to be called with interval
+  getSurroundingLocationDatas();
+  setInterval(getSurroundingLocationDatas, 2000);
+</script>
+<!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs" crossorigin="anonymous" type="module"></script>!-->
 <script type="module">
 //const ws = new WebSocket("wss://toma-ru.onrender.com");
 const currentHtmlUrl = window.location.href.split("/").filter(part => part !== "")[1]
