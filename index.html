@@ -89,6 +89,9 @@
     var d = R * c; // Distance in km
     return d;
   }
+  function deg2rad(deg) {
+      return deg * (Math.PI/180);
+  } 
   function calculateDirection(latitude1, longitude1, latitude2, longitude2) {
     const toRadians = (degrees) => (degrees * Math.PI) / 180;
     const toDegrees = (radians) => (radians * 180) / Math.PI;
