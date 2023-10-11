@@ -55,6 +55,9 @@
     }, 
     (err) => {
       console.log("error occurred while trying to access GPS location data");
+    },
+    {
+      enableHighAccuracy: true
     }
   )
   function sendLocationData(){
