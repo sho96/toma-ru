@@ -60,7 +60,7 @@ app.post("/updateLocation", (req, resp) => {
 app.get("/getLocations", (req, resp) => {
     //objToSend = convertClientGPSsToObject(clientGPSs);
     currentPosition = new Position(req.query.lat, req.query.lon);
-    dataToSend = limitRange(ClientGPS, new Position(currentPosition.lat, currentPosition.lon), 0.5)
+    dataToSend = limitRange(clientGPSs, new Position(currentPosition.lat, currentPosition.lon), 0.5)
     objToSend = mapToObject(dataToSend);
     delete objToSend[req.ip];
     resp.status(200).json(objToSend);
