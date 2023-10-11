@@ -43,11 +43,11 @@
       }
 
       deltaTime = (timeOfLocationUpdate - timeOfLastLocationUpdate) / 1000; //delta time in seconds
-      deltaDistance = getDistanceOnEarth(lastLocation.lat, lastLocation.lon, lat, lon); // distance in km
+      deltaDistance = getDistanceOnEarth(lastLocation.latitude, lastLocation.longitude, lat, lon); // distance in km
 
       currentSpeed = deltaDistance / deltaTime * 3600;
       if(currentSpeed > 5){
-        currentDirection = calculateDirection(lastLocation.lat, lastLocation.lon, lat, lon);
+        currentDirection = calculateDirection(lastLocation.latitude, lastLocation.longitude, lat, lon);
       }
 
       lastLocation = coords;
@@ -68,7 +68,7 @@
         direction: currentDirection,
         timeOfUpdate: timeOfLastLocationUpdate,
         position: {
-          lat: lastLocation.lat, lon: lastLocation.lon
+          lat: lastLocation.latitude, lon: lastLocation.longitude
         }
       }),
       headers: {
@@ -77,7 +77,7 @@
     })
   }
   function getSurroundingLocationDatas(){
-    fetch(`/getLocations?lat=${lastLocation.lat}&lon=${lastLocation.lon}`)
+    fetch(`/getLocations?lat=${lastLocation.latitude}&lon=${lastLocation.longitude}`)
     .then((resp) => resp.json())
     .then((data) => {
       surroundingVehicles = data;
