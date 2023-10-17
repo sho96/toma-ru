@@ -80,6 +80,7 @@
     fetch(`/getLocations?lat=${lastLocation.latitude}&lon=${lastLocation.longitude}`)
     .then((resp) => resp.json())
     .then((data) => {
+      console.log("data received")
       surroundingVehicles = data;
     })
   }
