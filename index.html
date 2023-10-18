@@ -28,6 +28,7 @@
   let currentDirection = 0; // forward direction of the vehicle in clockwise direction from 0 deg being the north
   let lastLocation;
   let surroundingVehicles;
+  let receivedPossibleCollision = {};
 
   navigator.geolocation.watchPosition(
     (location) => {
@@ -61,12 +62,12 @@
     }
   )
   function sendLocationData(){
-    fetch("/updateLocation", {
+    fetch(`/updateLocation`, {
       method: "POST",
       body: JSON.stringify({
         speed: currentSpeed,
         direction: currentDirection,
-        timeOfUpdate: timeOfLastLocationUpdate,
+        timeOfUpdate: timeOfLastLocationUpdate/1000,
         position: {
           lat: lastLocation.latitude, lon: lastLocation.longitude
         }
@@ -76,13 +77,12 @@
       }
     })
   }
-  function getSurroundingLocationDatas(){
-    fetch(`/getLocations?lat=${lastLocation.latitude}&lon=${lastLocation.longitude}`)
+  function getPossibleCollision(){
+    fetch(`/getPossibleCollision`)
     .then((resp) => resp.json())
-    .then((data) => {
-      console.log("data received")
-      surroundingVehicles = data;
-    })
+    .then((obj) => {
+      if(Object.keys(receivedPossibleCollision).length == 0) receivedPossibleCollision = obj;
+    });
   }
   function getDistanceOnEarth(lat1,lon1,lat2,lon2) {
     var R = 6371; // Radius of the earth in km
@@ -118,8 +118,7 @@
   }
 
   //set interval of functions that needs to be called with interval
-  getSurroundingLocationDatas();
-  setInterval(getSurroundingLocationDatas, 2000);
+  setInterval(getPossibleCollision, 1500);
 </script>
 <!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs" crossorigin="anonymous" type="module"></script>!-->
 <script type="module">
