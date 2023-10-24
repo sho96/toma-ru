@@ -235,6 +235,8 @@ async function predictWebcam() {
   window.requestAnimationFrame(predictWebcam);
 }
 
+let previousResultContainedCars = fasle;
+
 async function displayVideoDetections(detections){
   let strToShow = "";
   let containsCar = false;
@@ -248,9 +250,12 @@ async function displayVideoDetections(detections){
   if(containsCar){
     //fetch("/brake", {method: "POST"});
     //fetch("/disconnect", {method: "POST"});
-    ws.send("brake");
-    ws.send("disconnect");
+    if(!previousResultContainedCars){
+      ws.send("brake");
+      ws.send("disconnect");
+    }
   }
+  previousResultContainedCars = containsCar
 }
 
 </script>
