@@ -250,7 +250,7 @@ async function displayVideoDetections(detections){
   if(containsCar){
     //fetch("/brake", {method: "POST"});
     //fetch("/disconnect", {method: "POST"});
-    if(!window.sessionStorage.prcc){
+    if(window.sessionStorage.prcc == 'false'){
       const now = Date.now();
       const unixTimestamp = Math.floor(now/1000);
       const date = new Date(unixTimestamp * 1000);
@@ -261,11 +261,11 @@ async function displayVideoDetections(detections){
         millisecond: '2-digit',
       };
       const formattedDate = date.toLocaleDateString(undefined, options);
-      console.log(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`)
-      ws.send(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`)
+      console.log(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`);
+      ws.send(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`);
       ws.send("brake");
+      ws.send("disconnect");
     }
-    ws.send("disconnect");
   }
   window.sessionStorage.prcc = containsCar
 }
