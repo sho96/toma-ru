@@ -235,7 +235,7 @@ async function predictWebcam() {
   window.requestAnimationFrame(predictWebcam);
 }
 
-let previousResultContainedCars = false;
+window.sessionStorage.prcc = false;
 
 async function displayVideoDetections(detections){
   let strToShow = "";
@@ -250,12 +250,23 @@ async function displayVideoDetections(detections){
   if(containsCar){
     //fetch("/brake", {method: "POST"});
     //fetch("/disconnect", {method: "POST"});
-    if(!previousResultContainedCars){
+    if(!window.sessionStorage.prcc){
+      const now = Date.now();
+      const unixTimestamp = Math.floor(now/1000);
+      const date = new Date(unixTimestamp * 1000);
+      const options = {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        millisecond: '2-digit',
+      };
+      const formattedDate = date.toLocaleDateString(undefined, options);
       ws.send("brake");
-      ws.send("disconnect");
+      console.log(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`)
     }
+    ws.send("disconnect");
   }
-  previousResultContainedCars = containsCar
+  window.sessionStorage.prcc = containsCar
 }
 
 </script>
