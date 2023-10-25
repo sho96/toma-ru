@@ -137,6 +137,11 @@ ws.addEventListener("message", (event) => {
       console.log('from server:', reader.result);
       document.querySelector("#socket-traffic")
       .innerHTML += `${reader.result}<br>`;
+      if(reader.result == "startcam"){
+        window.sessionStorage.cameraStarted = true;
+        console.log("camera started!");
+        ws.send("camera started");
+      }
     };
     reader.onerror = function() {
         console.error('FileReader error:', reader.error);
@@ -236,6 +241,7 @@ async function predictWebcam() {
 }
 
 window.sessionStorage.prcc = false;
+window.sessionStorage.cameraStarted = false;
 
 async function displayVideoDetections(detections){
   let strToShow = "";
@@ -245,6 +251,9 @@ async function displayVideoDetections(detections){
       containsCar = true;
     }
     strToShow += `${detection.categories[0].categoryName} ${Math.round(parseFloat(detection.categories[0].score) * 100)}<br>`;
+  }
+  if(window.sessionStorage.cameraStarted == "false"){
+    return;
   }
   document.querySelector("#detection").innerHTML = strToShow;
   if(containsCar){
