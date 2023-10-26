@@ -298,7 +298,10 @@ async function getCurrentTimeInString(){
 
 const timeTag = document.querySelector("#time");
 setInterval(() => {
-  timeTag.innerHTML = getCurrentTimeInString();
+  getCurrentTimeInString()
+  .then((timestr) => {
+    timeTag.innerHTML = timestr;
+  });
 }, 50);
 
 </script>
