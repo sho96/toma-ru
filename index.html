@@ -290,8 +290,10 @@ function getCurrentTimeInString(){
     const seconds = now.getSeconds();
     const milliseconds = now.getMilliseconds();
     const formattedDateString = `${hour}:${minutes}:${seconds + milliseconds/1000}`;
+    return formattedDateString;
+  }else{
+    return "couldn't retrieve time data..."
   }
-  return formattedDateString;
 }
 
 const timeTag = document.querySelector("#time");
