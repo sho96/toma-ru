@@ -284,7 +284,7 @@ async function getCurrentTimeInString(){
   if (data && data.utc_datetime) {
     const internetTime = new Date(data.utc_datetime);
     console.log("Internet Time: " + internetTime);
-    const now = new Date(internetTime.utc_datetime);
+    const now = internetTime;
     const hour = now.getHours();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
