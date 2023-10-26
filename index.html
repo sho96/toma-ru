@@ -11,7 +11,7 @@
 <script>eruda.init();</script>
 <body style="font-family: Arial; height: 200vh;">
   <h1 id="ws-status">websocket...</h1>
-  <p id=time></p>
+  <p id="time" style="font-size: 3rem;"></p>
   <button id="startDetectionButton" style="width: 10rem; height: 2rem;">START DETECTION</button>
   <img src="room.png" alt="" id="image" hidden>
   <div id="liveView" class="videoView">
@@ -184,12 +184,12 @@ const objectDetector = await ObjectDetector.createFromOptions(vision, {
 });
 const enableWebcamButton = document.getElementById("webcamButton");
 enableWebcamButton.addEventListener("click", enableCam);
-const image = document.getElementById("image");
+/*const image = document.getElementById("image");
 const detections = objectDetector.detect(image)["detections"];
 detections.forEach(detection => {
   console.log(detection.categories[0].score);
   console.log(detection.categories[0].categoryName);
-});
+});*/
 
 function hasGetUserMedia() {
   return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -262,19 +262,10 @@ async function displayVideoDetections(detections){
     //fetch("/brake", {method: "POST"});
     //fetch("/disconnect", {method: "POST"});
     if(window.sessionStorage.prcc == 'false'){
-      const now = Date.now();
-      const unixTimestamp = Math.floor(now/1000);
-      const date = new Date(unixTimestamp * 1000);
-      const options = {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        millisecond: '2-digit',
-      };
-      const formattedDate = date.toLocaleDateString(undefined, options);
-      console.log(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`);
+      const formattedDateString = getCurrentTimeInString()
       ws.send("brake");
-      ws.send(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`);
+      console.log(`brake sent at: ${formattedDateString}`);
+      ws.send(`brake sent at: ${formattedDateString}`);
       ws.send("disconnect");
     }
   }
@@ -285,6 +276,21 @@ const startDetectionButton = document.querySelector("#startDetectionButton");
 startDetectionButton.addEventListener("click", () => {
   ws.send("startcam");
 });
+
+function getCurrentTimeInString(){
+  const now = new Date();
+  const hour = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const milliseconds = now.getMilliseconds();
+  const formattedDateString = `${hour}:${minutes}:${seconds + milliseconds/1000}`;
+  return formattedDateString;
+}
+
+const timeTag = document.querySelector("#time");
+setInterval(() => {
+  timeTag.innerHTML = getCurrentTimeInString();
+}, 1);
 
 </script>
 </html>
