@@ -13,6 +13,7 @@
   <h1 id="ws-status">websocket...</h1>
   <p id=time></p>
   <button id="startDetectionButton" style="width: 10rem; height: 2rem;">START DETECTION</button>
+  <img src="room.png" alt="" id="image" hidden>
   <div id="liveView" class="videoView">
     <button id="webcamButton" class="mdc-button mdc-button--raised" style="width: 10rem; height: 2rem;">
       <span class="mdc-button__ripple"></span>
@@ -20,8 +21,8 @@
     </button>
     <video id="webcam" autoplay playsinline></video>
   </div>
-  <h1 id="detection"></h1>
-  <h3 id="socket-traffic"></h3>
+  <h1 id="detection">---Detections---</h1>
+  <h3 id="socket-traffic">---socket logs---</h3>
 </body>
 <script>
   let timeOfLastLocationUpdate = null;
@@ -153,7 +154,7 @@ ws.addEventListener("message", (event) => {
     document.querySelector("#socket-traffic")
     .innerHTML += `${event.data}<br>`;
   }
-  handleLineLimit();
+  //handleLineLimit();
 });
 
 function handleLineLimit(){
