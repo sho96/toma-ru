@@ -262,7 +262,7 @@ async function displayVideoDetections(detections){
     //fetch("/brake", {method: "POST"});
     //fetch("/disconnect", {method: "POST"});
     if(window.sessionStorage.prcc == 'false'){
-      const formattedDateString = getCurrentTimeInString()
+      const formattedDateString = await getCurrentTimeInString()
       ws.send("brake");
       console.log(`brake sent at: ${formattedDateString}`);
       ws.send(`brake sent at: ${formattedDateString}`);
@@ -292,7 +292,7 @@ async function getCurrentTimeInString(){
     const formattedDateString = `${hour}:${minutes}:${seconds + milliseconds/1000}`;
     return formattedDateString;
   }else{
-    return "couldn't retrieve time data..."
+    return "couldn't retrieve time data...";
   }
 }
 
