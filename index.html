@@ -277,7 +277,7 @@ startDetectionButton.addEventListener("click", () => {
   ws.send("startcam");
 });
 
-function getCurrentTimeInString(){
+async function getCurrentTimeInString(){
   const response = await fetch("https://worldtimeapi.org/api/ip");
   const data = await response.json();
   
