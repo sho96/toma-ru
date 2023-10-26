@@ -273,8 +273,8 @@ async function displayVideoDetections(detections){
       };
       const formattedDate = date.toLocaleDateString(undefined, options);
       console.log(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`);
-      ws.send(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`);
       ws.send("brake");
+      ws.send(`brake sent at: ${formattedDate} ms:${(now/1000) % 1}`);
       ws.send("disconnect");
     }
   }
