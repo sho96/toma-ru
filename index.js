@@ -102,6 +102,9 @@ app.get("/", (request, response) => {
 app.get("/room.png", (request, response) => {
     response.status(200).send(readFileSync("./Red-Cup-1.jpg"));
 })
+app.get("/model", (request, response) => {
+    response.status(200).send(readFileSync("./model_int8_qat.tflite"));
+})
 app.post("/brake", (req, resp) => {
     socketServer.clients.forEach(client => {
         client.send("brake");
