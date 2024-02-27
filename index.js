@@ -31,7 +31,7 @@ socketServer.on("connection", (client) => {
         console.log("error occurred with client");
     }
 })
-
+/*
 class Position{
     constructor(latitude, longitude){
         this.lat = latitude;
@@ -93,7 +93,7 @@ app.get("/getPossibleCollisions", (req, resp) => {
         resp.status(200).json({});
     }
     resp.status(200).json(col);
-});
+});*/
 
 //handle html
 app.get("/", (request, response) => {
@@ -123,7 +123,7 @@ app.get("/health", (req, resp) => {
 })
 
 httpServer.listen(httpPort, () => console.log(`Server has started listening on port ${httpPort}.`));
-
+/*
 function convertClientGPSsToObject(clientGPSs){
     let resultObj = [];
     let count = 0;
@@ -233,3 +233,4 @@ setInterval(() => {
     });
     clientGPSs = result;
 }, 2000);
+*/
