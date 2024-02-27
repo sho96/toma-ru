@@ -177,8 +177,8 @@ const vision = await FilesetResolver.forVisionTasks(
 );
 const objectDetector = await ObjectDetector.createFromOptions(vision, {
   baseOptions: {
-    //modelAssetPath: `https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite`
-    modelAssetPath: `/model`
+    modelAssetPath: `https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite`
+    //modelAssetPath: `/model`
   },
   scoreThreshold: 0.5,
   runningMode: runningMode
