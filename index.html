@@ -249,9 +249,16 @@ window.sessionStorage.cameraStarted = false;
 async function displayVideoDetections(detections){
   let strToShow = "";
   let containsCar = false;
+  let hasDetectionWithItsHeightReached = false;
   for(let detection of detections.detections){
     if(detection.categories[0].categoryName == "car"){
       containsCar = true;
+    }else{
+      continue;
+    }
+    console.log(`Detected height: ${detection.box.h}`)
+    if(detection.box.h > 300){
+      hasDetectionWithItsHeightReached = true;
     }
     strToShow += `${detection.categories[0].categoryName} ${Math.round(parseFloat(detection.categories[0].score) * 100)}<br>`;
   }
@@ -259,7 +266,7 @@ async function displayVideoDetections(detections){
     return;
   }
   document.querySelector("#detection").innerHTML = strToShow;
-  if(containsCar){
+  if(hasDetectionWithItsHeightReached){
     //fetch("/brake", {method: "POST"});
     //fetch("/disconnect", {method: "POST"});
     if(window.sessionStorage.prcc == 'false'){
