@@ -262,8 +262,8 @@ async function displayVideoDetections(detections){
       continue;
     }
     window.sessionStorage.detection = detection;
-    console.log(`Detected height: ${detection.box.h}`)
-    if(detection.box.h > 300){
+    console.log(`Detected height: ${detection.box.height}`)
+    if(detection.box.height > 300){
       hasDetectionWithItsHeightReached = true;
     }
     strToShow += `${detection.categories[0].categoryName} ${Math.round(parseFloat(detection.categories[0].score) * 100)}<br>`;
