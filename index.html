@@ -248,7 +248,6 @@ window.sessionStorage.cameraStarted = false;
 
 async function displayVideoDetections(detections){
     try{
-        
   let strToShow = "";
   let containsCar = false;
   let hasDetectionWithItsHeightReached = false;
@@ -258,6 +257,7 @@ async function displayVideoDetections(detections){
     }else{
       continue;
     }
+    window.sessionStorage.detection = detection;
     console.log(`Detected height: ${detection.box.h}`)
     if(detection.box.h > 300){
       hasDetectionWithItsHeightReached = true;
