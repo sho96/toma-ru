@@ -25,6 +25,7 @@
   <h3 id="socket-traffic">---socket logs---</h3>
 </body>
 <script>
+    /*
   let timeOfLastLocationUpdate = null;
   let currentSpeed = 0; // current speed in km/h
   let currentDirection = 0; // forward direction of the vehicle in clockwise direction from 0 deg being the north
@@ -120,7 +121,7 @@
   }
 
   //set interval of functions that needs to be called with interval
-  setInterval(getPossibleCollision, 1500);
+  setInterval(getPossibleCollision, 1500);*/
 </script>
 <!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs" crossorigin="anonymous" type="module"></script>!-->
 <script type="module">
@@ -252,7 +253,9 @@ async function displayVideoDetections(detections){
   let strToShow = "";
   let containsCar = false;
   let hasDetectionWithItsHeightReached = false;
-  for(let detection of detections.detections){
+  console.log("enterting detection loop");
+        for(let detection of detections.detections){
+      console.log(detection);
     if(detection.categories[0].categoryName == "car"){
       containsCar = true;
     }else{
