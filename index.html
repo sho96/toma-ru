@@ -247,6 +247,8 @@ window.sessionStorage.prcc = false;
 window.sessionStorage.cameraStarted = false;
 
 async function displayVideoDetections(detections){
+    try{
+        
   let strToShow = "";
   let containsCar = false;
   let hasDetectionWithItsHeightReached = false;
@@ -278,6 +280,9 @@ async function displayVideoDetections(detections){
     }
   }
   window.sessionStorage.prcc = containsCar
+    } catch (err){
+    console.error(err);
+    }
 }
 
 const startDetectionButton = document.querySelector("#startDetectionButton");
