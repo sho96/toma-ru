@@ -248,12 +248,12 @@ window.sessionStorage.prcc = false;
 window.sessionStorage.cameraStarted = false;
 
 async function displayVideoDetections(detections){
-    console.log("displayVideoDetections called");
+    //console.log("displayVideoDetections called");
     try{
   let strToShow = "";
   let containsCar = false;
   let hasDetectionWithItsHeightReached = false;
-  console.log("enterting detection loop");
+  //console.log("enterting detection loop");
         for(let detection of detections.detections){
       console.log(detection);
     if(detection.categories[0].categoryName == "car"){
@@ -300,7 +300,7 @@ async function getCurrentTimeInString(){
   
   if (data && data.utc_datetime) {
     const internetTime = new Date(data.utc_datetime);
-    console.log("Internet Time: " + internetTime);
+    //console.log("Internet Time: " + internetTime);
     const now = internetTime;
     const hour = now.getHours();
     const minutes = now.getMinutes();
