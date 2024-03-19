@@ -10,6 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script>eruda.init();</script>
 <body style="font-family: Arial; height: 200vh;">
+    <input type="number" id="distance-field" placeholder="enter activation distance..."/>
   <h1 id="ws-status">websocket...</h1>
   <p id="time" style="font-size: 3rem;"></p>
   <button id="startDetectionButton" style="width: 10rem; height: 2rem;">START DETECTION</button>
@@ -125,6 +126,7 @@
 </script>
 <!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs" crossorigin="anonymous" type="module"></script>!-->
 <script type="module">
+const distanceField = document.querySelector("#distance-field");
 //const ws = new WebSocket("wss://toma-ru.onrender.com");
 const currentHtmlUrl = window.location.href.split("/").filter(part => part !== "")[1]
 const ws = new WebSocket(`wss://${currentHtmlUrl}`);
@@ -263,7 +265,7 @@ async function displayVideoDetections(detections){
     window.sessionStorage.detection = detection;
     //console.log(detection);
     console.log(`Detected height: ${detection.boundingBox.height}`)
-    if(detection.boundingBox.height > 300){
+    if(detection.boundingBox.height > distanceField.value){
       hasDetectionWithItsHeightReached = true;
     }
     strToShow += `${detection.categories[0].categoryName} ${Math.round(parseFloat(detection.categories[0].score) * 100)}<br>`;
