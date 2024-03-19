@@ -255,13 +255,13 @@ async function displayVideoDetections(detections){
   let hasDetectionWithItsHeightReached = false;
   //console.log("enterting detection loop");
         for(let detection of detections.detections){
-      console.log(detection);
     if(detection.categories[0].categoryName == "car"){
       containsCar = true;
     }else{
       continue;
     }
     window.sessionStorage.detection = detection;
+    //console.log(detection);
     console.log(`Detected height: ${detection.boundingBox.height}`)
     if(detection.boundingBox.height > 300){
       hasDetectionWithItsHeightReached = true;
