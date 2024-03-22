@@ -295,7 +295,6 @@ console.log(detection.categories[0].categoryName);
         //fetch("/disconnect", {method: "POST"});
         if (window.sessionStorage.prcc == "false") {
           const formattedDateString = await getCurrentTimeInString();
-          writeToPort("brake");
           writeToPort("on");
           ws.send("brake");
           console.log(`brake sent at: ${formattedDateString}`);
