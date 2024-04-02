@@ -48,7 +48,7 @@
         const coord = position.coords;
         const lat = coord.latitude;
         const lon = coord.longitude;
-        console.log(lat, lon);
+        //console.log(lat, lon);
 
         if(timeOfLastLocationUpdate == null){
           timeOfLastLocationUpdate = Date.now();
@@ -65,7 +65,7 @@
         //dt is in hours
         const d = getDistanceOnEarth(lat, lon, lastLocation.latitude, lastLocation.longitude);
         const v = d / dt;
-        console.log(v);
+        //#console.log(v);
         currentSpeed = v;
         document.querySelector("#speed").innerHTML = v.toFixed(2);
 
@@ -336,6 +336,11 @@ console.log(detection.categories[0].categoryName);
       for (let distance of detectedDistances){
         let currentBrakeDistance = 0.393+0.142*currentSpeed + 0.0105*Math.pow(currentSpeed, 2); //0.393+0.142x + 0.0105x^2
         let realValue = parseFloat(distanceToSpareField.value) + currentBrakeDistance;
+        console.log(`realValue: ${realValue}`);
+        console.log(`currentBrakeDistance: ${currentBrakeDistance}`);
+        console.log(`speed: ${currentSpeed}`);
+        console.log(`distance: ${distance}`);
+        console.log();
         if (distance < realValue){
           sendBrake(distance, currentSpeed, realValue);
           console.log("braking");
