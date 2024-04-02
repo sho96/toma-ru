@@ -16,6 +16,7 @@
 <body style="font-family: Arial; height: 200vh">
   <input type="number" id="distance-field" placeholder="enter activation distance..." value="4" />
   <button id="openPortButton">Open Port</button>
+  <button id="enableGPSButton">Start GPS Tracking</button>
   <h1 id="ws-status">websocket...</h1>
   <p id="time" style="font-size: 3rem"></p>
   <button id="startDetectionButton" style="width: 10rem; height: 2rem">
@@ -33,6 +34,38 @@
   <h3 id="socket-traffic">---socket logs---</h3>
 </body>
 <script>
+  let timeOfLastLocationUpdate = null;
+  let lastLocation = null;
+  document.querySelector("#enableGPSButton").addEventListener("click", () => {
+    if(!navigator.geolocation){
+      alert("Geolocation is not supported by the browser");
+    }else{
+      console.log("location tracking started");
+      navigator.geolocation.watchPosition(position => {
+        const coord = position.coords;
+        const lat = coord.latitude;
+        const lon = coord.longitude;
+        console.log(lat, lon);
+
+        if(timeOfLastLocationUpdate == null){
+          timeOfLastLocationUpdate = Date.now();
+          lastLocation = coord;
+          return;
+        }
+        
+        const dt = (Date.now() - timeOfLastLocationUpdate)/1000/3600;
+        //d is in km
+        //dt is in hours
+        const d = getDistanceOnEarth(lat, lon, lastLocation.latitude, lastLocation.longitude);
+        const v = d / dt;
+        console.log(v);
+
+        timeOfLastLocationUpdate = Date.now();
+        lastLocation = coord;
+      }, err => { console.error(err) })
+    }
+  })
+  
   /*
 let timeOfLastLocationUpdate = null;
 let currentSpeed = 0; // current speed in km/h
