@@ -336,7 +336,7 @@ console.log(detection.categories[0].categoryName);
       for (let distance of detectedDistances){
         let currentBrakeDistance = 0.393+0.142*currentSpeed + 0.0105*Math.pow(currentSpeed, 2); //0.393+0.142x + 0.0105x^2
         if (distance < distanceToSpareField.value + currentBrakeDistance){
-          sendBrake(distance, currentSpeed);
+          sendBrake(distance, currentSpeed, currentBrakeDistance);
           console.log("braking");
           break;
         }
