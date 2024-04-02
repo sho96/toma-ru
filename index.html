@@ -37,6 +37,7 @@
 <script>
   let timeOfLastLocationUpdate = null;
   let lastLocation = null;
+  let currentSpeed = null; // km/h
   document.querySelector("#enableGPSButton").addEventListener("click", () => {
     if(!navigator.geolocation){
       alert("Geolocation is not supported by the browser");
@@ -64,6 +65,7 @@
         const d = getDistanceOnEarth(lat, lon, lastLocation.latitude, lastLocation.longitude);
         const v = d / dt;
         console.log(v);
+        currentSpeed = v;
         document.querySelector("#speed").innerHTML = v.toFixed(2);
 
         timeOfLastLocationUpdate = Date.now();
