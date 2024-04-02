@@ -17,7 +17,7 @@
   <input type="number" id="distance-field" placeholder="enter activation distance..." value="4" />
   <button id="openPortButton">Open Port</button>
   <button id="enableGPSButton">Start GPS Tracking</button>
-  <h1>Current Speed: <span id="speed"></span> km/h</h1>
+  <h1>Current Speed: <span id="speed">--</span> km/h</h1>
   <h1 id="ws-status">websocket...</h1>
   <p id="time" style="font-size: 3rem"></p>
   <button id="startDetectionButton" style="width: 10rem; height: 2rem">
@@ -55,6 +55,10 @@
         }
         
         const dt = (Date.now() - timeOfLastLocationUpdate)/1000/3600;
+        if(dt < 0.4/1000/3600){
+          console.log("skipped location update");
+          return
+        }
         //d is in km
         //dt is in hours
         const d = getDistanceOnEarth(lat, lon, lastLocation.latitude, lastLocation.longitude);
@@ -64,7 +68,8 @@
 
         timeOfLastLocationUpdate = Date.now();
         lastLocation = coord;
-      }, err => { console.error(err) })
+      }, err => { console.error(err) },
+      {enableHighAccuracy: true, maximumAge: 0});
     }
   })
   
