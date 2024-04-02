@@ -335,8 +335,9 @@ console.log(detection.categories[0].categoryName);
       //check if braking conditions match here
       for (let distance of detectedDistances){
         let currentBrakeDistance = 0.393+0.142*currentSpeed + 0.0105*Math.pow(currentSpeed, 2); //0.393+0.142x + 0.0105x^2
-        if (distance < distanceToSpareField.value + currentBrakeDistance){
-          sendBrake(distance, currentSpeed, currentBrakeDistance);
+        let realValue = distanceToSpareField.value + currentBrakeDistance;
+        if (distance < realValue){
+          sendBrake(distance, currentSpeed, realValue);
           console.log("braking");
           break;
         }
