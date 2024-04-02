@@ -336,7 +336,7 @@ console.log(detection.categories[0].categoryName);
       for (let distance of detectedDistances){
         let currentBrakeDistance = 0.393+0.142*currentSpeed + 0.0105*Math.pow(currentSpeed, 2); //0.393+0.142x + 0.0105x^2
         if (distance < distanceToSpareField.value + currentBrakeDistance){
-          sendBrake();
+          sendBrake(distance, currentSpeed);
           console.log("braking");
           break;
         }
@@ -346,13 +346,13 @@ console.log(detection.categories[0].categoryName);
       console.error(err);
     }
   }
-  async function sendBrake(){
+  async function sendBrake(distance, speed, brakeDistance){
     const formattedDateString = await getCurrentTimeInString();
-    writeToPort("on");
+    //writeToPort("on");
     ws.send("brake");
     console.log(`brake sent at: ${formattedDateString}`);
-    ws.send(`brake sent at: ${formattedDateString}`);
-    ws.send("disconnect");
+    ws.send(`brake sent at: ${formattedDateString} \nestimatedDistance: ${distance}m \nspeed: ${speed}km/h \nestimatedBrakingDistance: ${brakeDistance}m`);
+    //ws.send("disconnect");
   }
 
   const startDetectionButton = document.querySelector(
