@@ -340,7 +340,7 @@ console.log(detection.categories[0].categoryName);
         console.log(`currentBrakeDistance: ${currentBrakeDistance}`);
         console.log(`speed: ${currentSpeed}`);
         console.log(`distance: ${distance}`);
-        console.log();
+        console.log("--------------");
         if (distance < realValue){
           sendBrake(distance, currentSpeed, realValue);
           console.log("braking");
@@ -359,6 +359,7 @@ console.log(detection.categories[0].categoryName);
     console.log(`brake sent at: ${formattedDateString}`);
     ws.send(`brake sent at: ${formattedDateString} \nestimatedDistance: ${distance}m \nspeed: ${speed}km/h \nestimatedBrakingDistance: ${brakeDistance}m`);
     //ws.send("disconnect");
+    ws.send("----------");
   }
 
   const startDetectionButton = document.querySelector(
