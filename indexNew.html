@@ -10,36 +10,125 @@
     <title>Toma-ru</title>
 </head>
 
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+    eruda.init();
+</script>
+
 <body>
     <section id="control-buttons">
         <button id="enable-sensors-button">Enable Sensors</button>
+        <button id="start-detection-button">Start Detection</button>
     </section>
     <section id="sensor-stats-container">
         <h3>GPS: <span id="gps-stat">disabled</span></h3>
         <h3>Cam: <span id="camera-stat">disabled</span></h3>
+        <h3>Detection: <span id="detection-stat">stopped</span></h3>
     </section>
-    <section id="socket-stats">
-        <h3>wss: <span id="websocket-stat">disconnected</span></h3>
-        <section id="socket-logs">
-            <div class="log">
-                <h4>10:20:30</h4>
-                <p>content</p>
-            </div>
-        </section>
+    <section id="sensor-values">
+        <h4><span id="speed-value">-</span> km/h</h4>
+        <h4>acc: <span id="accuracy-value">-</span> m</h4>
     </section>
     <section id="object-detection">
         <h1 id="detections-text">
-            car: 80%
+            ---
         </h1>
+        <video id="webcam" autoplay playsinline height="270px"></video>
+    </section>
+    <section id="socket-stats">
+        <h3>wss: <span id="websocket-stat">disconnected</span></h3>
+        <button id="delete-logs-button">Delete Logs</button>
+        <section id="socket-logs">
+            <!-- <div class="log">
+                <h4>10:20:30</h4>
+                <p>content</p>
+            </div> -->
+        </section>
     </section>
 </body>
 <script>
-    function formatTimeHourMinuteSecond(dateObject){
+    //sensors
+    let timeOfLastLocationUpdate = null;
+    let lastLocation = null;
+    let currentSpeed = 0; // km/h
+    let gpsAccuracy = 0;
+    function startGPS() {
+        if(!navigator.geolocation){
+            alert("geolocation not supported by your browser")
+        }
+        document.querySelector("#gps-stat").innerHTML = "enabled";
+        navigator.geolocation.watchPosition(
+            (position) => {
+                const coord = position.coords;
+                const lat = coord.latitude;
+                const lon = coord.longitude;
+
+                gpsAccuracy = coord.accuracy;
+                document.querySelector("#gps-accuracy").innerHTML = coord.accuracy;
+                //console.log(lat, lon);
+
+                if (timeOfLastLocationUpdate == null) {
+                    timeOfLastLocationUpdate = Date.now();
+                    lastLocation = coord;
+                    return;
+                }
+
+                const dt = (Date.now() - timeOfLastLocationUpdate) / 1000 / 3600;
+                if (dt < 850 / 1000 / 3600) {
+                    console.log("skipped location update");
+                    return;
+                }
+                //d is in km
+                //dt is in hours
+                const d = getDistanceOnEarth(lat, lon, lastLocation.latitude, lastLocation.longitude);
+                const v = d / dt;
+                //#console.log(v);
+                currentSpeed = v;
+                document.querySelector("#speed").innerHTML = v.toFixed(2);
+
+                timeOfLastLocationUpdate = Date.now();
+                lastLocation = coord;
+            },
+            (err) => {
+                console.error(err);
+                alert(err);
+            },
+            { enableHighAccuracy: true, maximumAge: 0 }
+        );
+    }
+    function getDistanceOnEarth(lat1, lon1, lat2, lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2 - lat1); // deg2rad below
+        var dLon = deg2rad(lon2 - lon1);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c; // Distance in km
+        return d;
+    }
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+</script>
+<script>
+    //generics
+    function formatTimeHourMinuteSecond(dateObject) {
         return `${dateObject.getHours()}:${dateObject.getMinutes()}:${dateObject.getSeconds()}`;
     }
 </script>
 <script>
-    const ws = new WebSocket(`wss://${currentHtmlUrl}`);
+    //time management
+    let currentTime = new Date();
+    async function updateTime() {
+        const time = await (await fetch("/time")).json()
+        currentTime = new Date(time.now);
+    }
+    setInterval(updateTime, 200);
+</script>
+<script>
+    //websocket
+    const currentHtmlUrl = window.location.href.split("/").filter((part) => part !== "")[1];
+    //const ws = new WebSocket(`wss://${currentHtmlUrl}`);
+    const ws = new WebSocket(`ws://${currentHtmlUrl}`);
     ws.addEventListener("open", (event) => {
         document.querySelector("#websocket-stat").innerHTML = "connected";
     });
@@ -49,10 +138,11 @@
 
             reader.onload = function () {
                 console.log("from server:", reader.result);
-                document.querySelector("#socket-logs").innerHTML += buildLogElement(formatTimeHourMinuteSecond(), reader.result);
+                document.querySelector("#socket-logs").innerHTML += buildLogElement(formatTimeHourMinuteSecond(currentTime), reader.result);
                 if (reader.result == "startcam") {
                     window.sessionStorage.cameraStarted = true;
                     ws.send("camera started");
+                    document.querySelector("#detection-stat").innerHTML = "started";
                 }
             };
             reader.onerror = function () {
@@ -61,15 +151,22 @@
             reader.readAsText(event.data);
         } else {
             console.log(`from server: ${event.data}`);
-            document.querySelector("#socket-traffic").innerHTML += buildLogElement(formatTimeHourMinuteSecond(), reader.result);
+            document.querySelector("#socket-logs").innerHTML += buildLogElement(formatTimeHourMinuteSecond(currentTime), event.data);
         }
-        //handleLineLimit();
     });
+    function buildLogElement(formattedTimeString, content) {
+        return `
+        <div class="log">
+            <h4>${formattedTimeString}</h4>
+            <p>${content}</p>
+        </div>
+        `;
+    }
 </script>
-<script>
-    window.sessionStorage.cameraStarted = false;
-
+<script type="module">
+    
     import { ObjectDetector, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.2";
+    window.sessionStorage.cameraStarted = false;
     const vision = await FilesetResolver.forVisionTasks(
         // path/to/wasm/root
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
@@ -83,8 +180,8 @@
         runningMode: "VIDEO",
     });
 
-    const enableWebcamButton = document.getElementById("webcamButton");
-    enableWebcamButton.addEventListener("click", enableCam);
+    //const enableWebcamButton = document.getElementById("webcamButton");
+    //enableWebcamButton.addEventListener("click", enableCam);
 
     let video = document.getElementById("webcam");
     function enableCam(e) {
@@ -106,6 +203,7 @@
             .then(function (stream) {
                 video.srcObject = stream;
                 video.addEventListener("loadeddata", predictWebcam);
+                document.querySelector("#camera-stat").innerHTML = "enabled";
             })
             .catch((err) => {
                 console.error(err);
@@ -116,21 +214,27 @@
     let lastVideoTime = -1;
     let previousFrameContainedCars = false;
     function predictWebcam() {
-        // if image mode is initialized, create a new classifier with video runningMode.
+        if (!window.sessionStorage.cameraStarted) {
+            window.requestAnimationFrame(predictWebcam);
+            return;
+        }
+        //console.log("frame");
+
         let startTimeMs = performance.now();
 
         // Detect objects using detectForVideo.
         if (video.currentTime !== lastVideoTime) {
             lastVideoTime = video.currentTime;
-            const detections = objectDetector.detectForVideo(video, startTimeMs);
+            const detections = objectDetector.detectForVideo(video, startTimeMs).detections;
 
             displayDetections(detections);
 
             const distanceToCars = calculateDistanceFromDetections(detections);
             const containsConditionMatchingCars = containsDangerouslyCloseCars(distanceToCars, currentSpeed);
-            if (containsConditionMatchingCars) {
+            if (containsConditionMatchingCars && !previousFrameContainedCars) {
                 sendBrake();
             }
+            previousFrameContainedCars = containsConditionMatchingCars;
         }
         // Call this function again to keep predicting when the browser is ready.
         window.requestAnimationFrame(predictWebcam);
@@ -178,15 +282,6 @@
         document.querySelector("#detections-text").innerHTML = resultText;
     }
 
-    function buildLogElement(formattedTimeString, content){
-        return `
-        <div class="log">
-            <h4>${formattedTimeString}</h4>
-            <p>${content}</p>
-        </div>
-        `;
-    }
-
     async function sendBrake(distance, speed, brakeDistance) {
         const formattedDateString = await getCurrentTimeInString();
         //writeToPort("on");
@@ -212,9 +307,24 @@
         return formattedDateString;
     }
 
-    const startDetectionButton = document.querySelector("#startDetectionButton");
+    document.querySelector("#enable-sensors-button").addEventListener("click", () => {
+        try{
+            enableCam(null);
+            startGPS();
+        } catch (err) {
+            console.error(err);
+            alert(err);
+        }
+
+    });
+
+    const startDetectionButton = document.querySelector("#start-detection-button");
     startDetectionButton.addEventListener("click", () => {
         ws.send("startcam");
+    });
+
+    document.querySelector("#delete-logs-button").addEventListener("click", () => {
+        document.querySelector("#socket-logs").innerHTML = "";
     });
 
 </script>
@@ -228,14 +338,19 @@
         font-family: Arial;
     }
 
-    #header {
+    #control-buttons {
         display: flex;
         flex-direction: row;
-        justify-content: center;
+        justify-content: space-evenly;
 
         h1 {
             font-size: larger;
         }
+    }
+    #sensor-values{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
     }
 
     section {
@@ -261,18 +376,26 @@
         cursor: pointer;
     }
 
-    #socket-logs{
-        .log{
+    #socket-stats{
+        gap: 10px;
+    }
+    #socket-logs {
+        width: calc(100vw - 50px);
+        height: 500px;
+        overflow-y: scroll;
+        .log {
             display: flex;
             flex-direction: row;
             gap: 20px;
             align-items: center;
             width: calc(100vw - 100px);
-            p{
+            border-bottom: 1px dashed gray;
+
+            p {
                 border-left: 2px solid var(--primaryColor);
                 padding-left: 10px;
             }
-            border-bottom: 1px dashed gray;
+
         }
     }
 </style>
