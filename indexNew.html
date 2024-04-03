@@ -19,20 +19,22 @@
     <section id="control-buttons">
         <button id="enable-sensors-button">Enable Sensors</button>
         <button id="start-detection-button">Start Detection</button>
+        <button id="switch-model-button">Switch Model</button>
     </section>
     <section id="sensor-stats-container">
         <h3>GPS: <span id="gps-stat">disabled</span></h3>
         <h3>Cam: <span id="camera-stat">disabled</span></h3>
         <h3>Detection: <span id="detection-stat">stopped</span></h3>
+        <h3>Model: <span id="model-type">Mediapipe Original</span></h3>
     </section>
     <section id="sensor-values">
         <h4><span id="speed-value">-</span> km/h</h4>
         <h4>acc: <span id="accuracy-value">-</span> m</h4>
     </section>
     <section id="object-detection">
-        <h1 id="detections-text">
+        <h4 id="detection-labels">
             ---
-        </h1>
+        </h4>
         <video id="webcam" autoplay playsinline height="270px"></video>
     </section>
     <section id="socket-stats">
@@ -46,6 +48,17 @@
         </section>
     </section>
 </body>
+<script>
+    if(window.sessionStorage.isCustomModel == null){
+        window.sessionStorage.isCustomModel = true;
+    }
+    document.querySelector("#model-type").innerHTML = 
+        (window.sessionStorage.isCustomModel == "true") ? "Customized Model" : "Mediapipe Original";
+    document.querySelector("#switch-model-button").addEventListener("click", () => {
+        window.sessionStorage.isCustomModel = !(window.sessionStorage.isCustomModel == "true");
+        alert("model switched. RELOAD TO TAKE EFFECT");
+    })
+</script>
 <script>
     //sensors
     let timeOfLastLocationUpdate = null;
@@ -74,15 +87,13 @@
                 }
 
                 const dt = (Date.now() - timeOfLastLocationUpdate) / 1000 / 3600;
-                if (dt < 850 / 1000 / 3600) {
-                    console.log("skipped location update");
+                if (dt < 850 / 1000 / 3600) { // skip speed update if dt is less than 850ms
                     return;
                 }
                 //d is in km
                 //dt is in hours
                 const d = getDistanceOnEarth(lat, lon, lastLocation.latitude, lastLocation.longitude);
                 const v = d / dt;
-                //#console.log(v);
                 currentSpeed = v;
                 document.querySelector("#speed-value").innerHTML = v.toFixed(2);
 
@@ -164,17 +175,22 @@
     }
 </script>
 <script type="module">
-    
+    const mediapipeModelPath = `https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite`;
+    const customModelPath = "/model";
     import { ObjectDetector, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.2";
     window.sessionStorage.cameraStarted = false;
     const vision = await FilesetResolver.forVisionTasks(
         // path/to/wasm/root
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
     );
+    console.log(window.sessionStorage.isCustomModel);
+    const modelPath = (window.sessionStorage.isCustomModel == "true") ? customModelPath : mediapipeModelPath;
+    console.log(`chosen model: ${modelPath}`);
     const objectDetector = await ObjectDetector.createFromOptions(vision, {
         baseOptions: {
+            modelAssetPath: modelPath
             //modelAssetPath: `https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite`,
-            modelAssetPath: `/model` //custom model
+            //modelAssetPath: `/model` //custom model
         },
         scoreThreshold: 0.45,
         runningMode: "VIDEO",
@@ -232,7 +248,7 @@
             const distanceToCars = calculateDistanceFromDetections(detections);
             const containsConditionMatchingCars = containsDangerouslyCloseCars(distanceToCars, currentSpeed);
             if (containsConditionMatchingCars && !previousFrameContainedCars) {
-                sendBrake();
+                sendBrake(null, currentSpeed, null);
             }
             previousFrameContainedCars = containsConditionMatchingCars;
         }
@@ -277,16 +293,15 @@
             if (category != "car") {
                 continue;
             }
-            resultText += `car: ${Math.round(parseFloat(detection.categories[0].score) * 100)}<br>`;
+            resultText += `<p>car: ${Math.round(parseFloat(detection.categories[0].score) * 100)}</p>`;
         }
-        document.querySelector("#detections-text").innerHTML = resultText;
+        document.querySelector("#detection-labels").innerHTML = resultText;
     }
 
     async function sendBrake(distance, speed, brakeDistance) {
         const formattedDateString = await getCurrentTimeInString();
         //writeToPort("on");
         ws.send("brake");
-        console.log(`brake sent at: ${formattedDateString}`);
         ws.send(`brake sent at: ${formattedDateString}`);
         ws.send(`estimatedDistance: ${distance}m`);
         ws.send(`speed: ${speed}km/h`);
@@ -365,8 +380,8 @@
         padding: 5px;
         border: none;
         background-color: var(--primaryColor);
-        border-radius: 5px;
-        width: 150px;
+        border-radius: 10px;
+        width: 130px;
         height: 30px;
         transition: all 0.125s ease-out;
     }
@@ -374,6 +389,15 @@
     button:hover {
         background-color: var(--secondryColor);
         cursor: pointer;
+    }
+
+    #detection-labels{
+        display: flex;
+        gap: 5px;
+        p{
+            border: 2px solid gray;
+            padding: 5px;
+        }
     }
 
     #socket-stats{
