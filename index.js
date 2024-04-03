@@ -99,6 +99,9 @@ app.get("/getPossibleCollisions", (req, resp) => {
 app.get("/", (request, response) => {
     response.status(200).send(readFileSync("./index.html", {encoding: "utf-8"}));
 })
+app.get("/time", (req, resp) => {
+    resp.json({now: Date.now()});
+});
 app.get("/room.png", (request, response) => {
     response.status(200).send(readFileSync("./Red-Cup-1.jpg"));
 })

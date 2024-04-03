@@ -298,6 +298,15 @@
     });
 
     async function getCurrentTimeInString() {
+        const time = await (await fetch("/time")).json();
+        const date = new Date(parseInt(time));
+        const hour = date.getHours();
+        const minutes = date.getMinutes();
+        const seconds = date.getSeconds();
+        const milliseconds = date.getMilliseconds();
+        const formattedDateString = `${hour}:${minutes}:${seconds + milliseconds / 1000}`;
+        return formattedDateString;
+
         const response = await fetch("https://worldtimeapi.org/api/ip");
         const data = await response.json();
 
