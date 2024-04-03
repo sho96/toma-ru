@@ -13,12 +13,13 @@
     eruda.init();
 </script>
 
-<body style="font-family: Arial; height: 200vh">
+<body style="font-family: Arial;">
     <input type="number" id="distance-field" placeholder="enter activation distance..." value="4" />
     <input type="number" id="distance-to-spare-field" placeholder="enter spare distance..." value="3" />
     <button id="openPortButton">Open Port</button>
     <button id="enableGPSButton">Start GPS Tracking</button>
     <h1>Current Speed: <span id="speed">--</span> km/h</h1>
+    <h1>GPS Accuracy: <span id="gps-accuracy">--</span>m</h1>
     <h1 id="ws-status">websocket...</h1>
     <p id="time" style="font-size: 3rem"></p>
     <button id="startDetectionButton" style="width: 10rem; height: 2rem">START DETECTION</button>
@@ -31,12 +32,13 @@
         <video id="webcam" autoplay playsinline></video>
     </div>
     <h1 id="detection">---Detections---</h1>
-    <h3 id="socket-traffic">---socket logs---</h3>
+    <h3 id="socket-traffic" style="height: 300px; overflow-y: scroll">---socket logs---</h3>
 </body>
 <script>
     let timeOfLastLocationUpdate = null;
     let lastLocation = null;
     let currentSpeed = null; // km/h
+    let gpsAccuracy = null;
     document.querySelector("#enableGPSButton").addEventListener("click", () => {
         if (!navigator.geolocation) {
             alert("Geolocation is not supported by the browser");
@@ -47,6 +49,9 @@
                     const coord = position.coords;
                     const lat = coord.latitude;
                     const lon = coord.longitude;
+
+                    gpsAccuracy = coord.accuracy;
+                    document.querySelector("#gps-accuracy").innerHTML = coord.accuracy;
                     //console.log(lat, lon);
 
                     if (timeOfLastLocationUpdate == null) {
@@ -231,7 +236,7 @@
         //console.log("displayVideoDetections called");
         try {
             const detectedDistances = [];
-            if (window.sessionStorage.cameraStarted == "false") {
+            if (!window.sessionStorage.cameraStarted) {
                 return;
             }
             let strToShow = "";
@@ -278,8 +283,8 @@
         //writeToPort("on");
         ws.send("brake");
         console.log(`brake sent at: ${formattedDateString}`);
-        ws.send(`brake sent at: ${formattedDateString} \n\n \n`);
-        ws.send(`estimatedDistance: ${distance}m `);
+        ws.send(`brake sent at: ${formattedDateString}`);
+        ws.send(`estimatedDistance: ${distance}m`);
         ws.send(`speed: ${speed}km/h`);
         ws.send(`estimatedBrakingDistance: ${brakeDistance}m`);
 
