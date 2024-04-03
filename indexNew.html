@@ -64,7 +64,7 @@
                 const lon = coord.longitude;
 
                 gpsAccuracy = coord.accuracy;
-                document.querySelector("#gps-accuracy").innerHTML = coord.accuracy;
+                document.querySelector("#accuracy-value").innerHTML = coord.accuracy;
                 //console.log(lat, lon);
 
                 if (timeOfLastLocationUpdate == null) {
@@ -84,7 +84,7 @@
                 const v = d / dt;
                 //#console.log(v);
                 currentSpeed = v;
-                document.querySelector("#speed").innerHTML = v.toFixed(2);
+                document.querySelector("#speed-value").innerHTML = v.toFixed(2);
 
                 timeOfLastLocationUpdate = Date.now();
                 lastLocation = coord;
@@ -127,8 +127,8 @@
 <script>
     //websocket
     const currentHtmlUrl = window.location.href.split("/").filter((part) => part !== "")[1];
-    //const ws = new WebSocket(`wss://${currentHtmlUrl}`);
-    const ws = new WebSocket(`ws://${currentHtmlUrl}`);
+    const ws = new WebSocket(`wss://${currentHtmlUrl}`);
+    //const ws = new WebSocket(`ws://${currentHtmlUrl}`);
     ws.addEventListener("open", (event) => {
         document.querySelector("#websocket-stat").innerHTML = "connected";
     });
