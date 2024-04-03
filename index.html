@@ -299,7 +299,7 @@
 
     async function getCurrentTimeInString() {
         const time = await (await fetch("/time")).json();
-        const date = new Date(parseInt(time));
+        const date = new Date(time.now);
         const hour = date.getHours();
         const minutes = date.getMinutes();
         const seconds = date.getSeconds();
