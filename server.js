@@ -31,6 +31,9 @@ socketServer.on("connection", (client) => {
 app.get("/", (request, response) => {
     response.status(200).send(readFileSync("./indexNew.html", {encoding: "utf-8"}));
 })
+app.get("/clock", (req, resp) => {
+    resp.send(readFileSync("./clock.html", {encoding: "utf-8"}));
+})
 app.get("/time", (req, resp) => {
     resp.json({now: Date.now()});
 });

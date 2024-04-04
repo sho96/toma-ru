@@ -5,8 +5,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js"
         crossorigin="anonymous"></script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Toma-ru</title>
 </head>
 
@@ -32,9 +32,7 @@
         <h4>acc: <span id="accuracy-value">-</span> m</h4>
     </section>
     <section id="object-detection">
-        <h4 id="detection-labels">
-            ---
-        </h4>
+        <h4 id="detection-distances">---</h4>
         <video id="webcam" autoplay playsinline height="270px"></video>
     </section>
     <section id="socket-stats">
@@ -49,15 +47,14 @@
     </section>
 </body>
 <script>
-    if(window.sessionStorage.isCustomModel == null){
+    if (window.sessionStorage.isCustomModel == null) {
         window.sessionStorage.isCustomModel = true;
     }
-    document.querySelector("#model-type").innerHTML = 
-        (window.sessionStorage.isCustomModel == "true") ? "Customized Model" : "Mediapipe Original";
+    document.querySelector("#model-type").innerHTML = window.sessionStorage.isCustomModel == "true" ? "Customized Model" : "Mediapipe Original";
     document.querySelector("#switch-model-button").addEventListener("click", () => {
         window.sessionStorage.isCustomModel = !(window.sessionStorage.isCustomModel == "true");
         alert("model switched. RELOAD TO TAKE EFFECT");
-    })
+    });
 </script>
 <script>
     //sensors
@@ -66,8 +63,8 @@
     let currentSpeed = 0; // km/h
     let gpsAccuracy = 0;
     function startGPS() {
-        if(!navigator.geolocation){
-            alert("geolocation not supported by your browser")
+        if (!navigator.geolocation) {
+            alert("geolocation not supported by your browser");
         }
         document.querySelector("#gps-stat").innerHTML = "enabled";
         navigator.geolocation.watchPosition(
@@ -87,7 +84,8 @@
                 }
 
                 const dt = (Date.now() - timeOfLastLocationUpdate) / 1000 / 3600;
-                if (dt < 850 / 1000 / 3600) { // skip speed update if dt is less than 850ms
+                if (dt < 850 / 1000 / 3600) {
+                    // skip speed update if dt is less than 850ms
                     return;
                 }
                 //d is in km
@@ -130,7 +128,7 @@
     //time management
     let currentTime = new Date();
     async function updateTime() {
-        const time = await (await fetch("/time")).json()
+        const time = await (await fetch("/time")).json();
         currentTime = new Date(time.now);
     }
     setInterval(updateTime, 200);
@@ -184,11 +182,11 @@
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
     );
     console.log(window.sessionStorage.isCustomModel);
-    const modelPath = (window.sessionStorage.isCustomModel == "true") ? customModelPath : mediapipeModelPath;
+    const modelPath = window.sessionStorage.isCustomModel == "true" ? customModelPath : mediapipeModelPath;
     console.log(`chosen model: ${modelPath}`);
     const objectDetector = await ObjectDetector.createFromOptions(vision, {
         baseOptions: {
-            modelAssetPath: modelPath
+            modelAssetPath: modelPath,
             //modelAssetPath: `https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite`,
             //modelAssetPath: `/model` //custom model
         },
@@ -230,7 +228,7 @@
     let lastVideoTime = -1;
     let previousFrameContainedCars = false;
     function predictWebcam() {
-        if (!window.sessionStorage.cameraStarted) {
+        if (window.sessionStorage.cameraStarted == "false") {
             window.requestAnimationFrame(predictWebcam);
             return;
         }
@@ -243,12 +241,15 @@
             lastVideoTime = video.currentTime;
             const detections = objectDetector.detectForVideo(video, startTimeMs).detections;
 
-            displayDetections(detections);
+            //displayDetections(detections);
 
             const distanceToCars = calculateDistanceFromDetections(detections);
+
+            displayDistances(distanceToCars);
+
             const containsConditionMatchingCars = containsDangerouslyCloseCars(distanceToCars, currentSpeed);
             if (containsConditionMatchingCars && !previousFrameContainedCars) {
-                sendBrake(null, currentSpeed, null);
+                sendBrake(distanceToCars, currentSpeed, calculateBrakingDistanceFromSpeed(currentSpeed));
             }
             previousFrameContainedCars = containsConditionMatchingCars;
         }
@@ -272,40 +273,47 @@
 
     function containsDangerouslyCloseCars(distances, speed) {
         const currentBrakeDistance = calculateBrakingDistanceFromSpeed(speed);
-        const distanceToSpare = 5 //change accordingly
-        const filtered = distances.filter(distance => distance < currentBrakeDistance + distanceToSpare);
-        return filtered.length;
+        const distanceToSpare = 5; //change accordingly
+        const filtered = distances.filter((distance) => distance < currentBrakeDistance + distanceToSpare);
+        return filtered.length > 0;
     }
 
     function calculateBrakingDistanceFromSpeed(speed) {
-        return 0.275 * speed + 0.008 * Math.pow(speed, 2)
+        return 0.275 * speed + 0.008 * Math.pow(speed, 2);
     }
 
     function calculateDistanceFromPixelHeight(pixelHeight) {
         return 918 / pixelHeight - 0.23;
     }
 
+    //function displayDetections(detections) {
+    //    let resultText = "";
+    //    for (let detection of detections) {
+    //        let category = detection.categories[0].categoryName;
+    //        if (category != "car") {
+    //            continue;
+    //        }
+    //        resultText += `<p>car: ${Math.round(parseFloat(detection.categories[0].score) * 100)}</p>`;
+    //    }
+    //    document.querySelector("#detection-labels").innerHTML = resultText;
+    //}
 
-    function displayDetections(detections) {
+    function displayDistances(distances){
         let resultText = "";
-        for (let detection of detections) {
-            let category = detection.categories[0].categoryName;
-            if (category != "car") {
-                continue;
-            }
-            resultText += `<p>car: ${Math.round(parseFloat(detection.categories[0].score) * 100)}</p>`;
+        for (let distance of distances) {
+            resultText += `<p>${distance.toFixed(1)}m</p>`;
         }
-        document.querySelector("#detection-labels").innerHTML = resultText;
+        document.querySelector("#detection-distances").innerHTML = resultText;
     }
 
-    async function sendBrake(distance, speed, brakeDistance) {
+    async function sendBrake(distances, speed, brakeDistance) {
         const formattedDateString = await getCurrentTimeInString();
         //writeToPort("on");
         ws.send("brake");
         ws.send(`brake sent at: ${formattedDateString}`);
-        ws.send(`estimatedDistance: ${distance}m`);
-        ws.send(`speed: ${speed}km/h`);
-        ws.send(`estimatedBrakingDistance: ${brakeDistance}m`);
+        ws.send(`distances: ${distances.map(e => e.toFixed(1)).join(", ")} (m)`);
+        ws.send(`speed: ${speed.toFixed(1)}km/h`);
+        ws.send(`braking distance: ${brakeDistance.toFixed(1)}m`);
 
         //ws.send("disconnect");
         ws.send("----------");
@@ -323,14 +331,13 @@
     }
 
     document.querySelector("#enable-sensors-button").addEventListener("click", () => {
-        try{
+        try {
             enableCam(null);
             startGPS();
         } catch (err) {
             console.error(err);
             alert(err);
         }
-
     });
 
     const startDetectionButton = document.querySelector("#start-detection-button");
@@ -341,7 +348,6 @@
     document.querySelector("#delete-logs-button").addEventListener("click", () => {
         document.querySelector("#socket-logs").innerHTML = "";
     });
-
 </script>
 <style>
     body {
@@ -362,7 +368,8 @@
             font-size: larger;
         }
     }
-    #sensor-values{
+
+    #sensor-values {
         display: flex;
         flex-direction: row;
         justify-content: space-evenly;
@@ -391,22 +398,34 @@
         cursor: pointer;
     }
 
-    #detection-labels{
+    #object-detection {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+
+    #detection-distances {
         display: flex;
         gap: 5px;
-        p{
+        height: 50px;
+
+        p {
             border: 2px solid gray;
             padding: 5px;
+            height: 1rem;
         }
     }
 
-    #socket-stats{
+    #socket-stats {
         gap: 10px;
     }
+
     #socket-logs {
         width: calc(100vw - 50px);
         height: 500px;
         overflow-y: scroll;
+
         .log {
             display: flex;
             flex-direction: row;
@@ -419,7 +438,6 @@
                 border-left: 2px solid var(--primaryColor);
                 padding-left: 10px;
             }
-
         }
     }
 </style>
