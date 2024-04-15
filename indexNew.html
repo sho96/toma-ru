@@ -265,7 +265,8 @@
                 continue;
             }
             //contains car
-            let distanceToCar = calculateDistanceFromPixelHeight(detection.boundingBox.height);
+            //let distanceToCar = calculateDistanceFromPixelHeight(detection.boundingBox.height);
+            let distanceToCar = detection.boundingBox.height;
             result.push(distanceToCar);
         }
         return result;
@@ -301,7 +302,7 @@
     function displayDistances(distances){
         let resultText = "";
         for (let distance of distances) {
-            resultText += `<p>${distance.toFixed(1)}m</p>`;
+            resultText += `<p>${distance.toFixed(1)}</p>`;
         }
         document.querySelector("#detection-distances").innerHTML = resultText;
     }
