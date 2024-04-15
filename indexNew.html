@@ -267,6 +267,7 @@
             //contains car
             //let distanceToCar = calculateDistanceFromPixelHeight(detection.boundingBox.height);
             let distanceToCar = detection.boundingBox.height;
+            ws.send(`${distanceToCar} pixels`);
             result.push(distanceToCar);
         }
         return result;
