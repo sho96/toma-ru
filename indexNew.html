@@ -289,7 +289,8 @@
         //return 918 / pixelHeight - 0.23;
         //return 472 / (pixelHeight - 46.8);
         //return 385 / (pixelHeight - 66.5);
-        return 351 / (672 - Math.sqrt(451584 + 9126 - 351 * pixelHeight));
+        //return 351 / (672 - Math.sqrt(451584 + 9126 - 351 * pixelHeight));
+        return (16.2 - Math.sqrt(16.2 * 16.2 - 4 * 0.286 * (220 - pixelHeight))) / 0.286 / 2
     }
 
     //function displayDetections(detections) {
