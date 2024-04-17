@@ -265,9 +265,9 @@
                 continue;
             }
             //contains car
-            //let distanceToCar = calculateDistanceFromPixelHeight(detection.boundingBox.height);
-            let distanceToCar = detection.boundingBox.height;
-            ws.send(`${distanceToCar} pixels`);
+            let distanceToCar = calculateDistanceFromPixelHeight(detection.boundingBox.height);
+            //let distanceToCar = detection.boundingBox.height;
+            //ws.send(`${distanceToCar} pixels`);
             result.push(distanceToCar);
         }
         return result;
@@ -275,17 +275,19 @@
 
     function containsDangerouslyCloseCars(distances, speed) {
         const currentBrakeDistance = calculateBrakingDistanceFromSpeed(speed);
-        const distanceToSpare = 5; //change accordingly
+        const distanceToSpare = 3; //change accordingly
         const filtered = distances.filter((distance) => distance < currentBrakeDistance + distanceToSpare);
         return filtered.length > 0;
     }
 
     function calculateBrakingDistanceFromSpeed(speed) {
         return 0.275 * speed + 0.008 * Math.pow(speed, 2);
+        //return 0.275 * speed + 0.008 * Math.pow(speed, 2);
     }
 
     function calculateDistanceFromPixelHeight(pixelHeight) {
-        return 918 / pixelHeight - 0.23;
+        //return 918 / pixelHeight - 0.23;
+        return 1 / (472*pixelHeight + 46.8);
     }
 
     //function displayDetections(detections) {
