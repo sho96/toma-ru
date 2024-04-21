@@ -246,12 +246,18 @@
             const distanceToCars = calculateDistanceFromDetections(detections);
 
             displayDistances(distanceToCars);
-
-            const containsConditionMatchingCars = containsDangerouslyCloseCars(distanceToCars, currentSpeed);
-            if (containsConditionMatchingCars && !previousFrameContainedCars) {
+            
+            if(distanceToCars.length > 0 && !previousFrameContainedCars){
                 sendBrake(distanceToCars, currentSpeed, calculateBrakingDistanceFromSpeed(currentSpeed));
             }
-            previousFrameContainedCars = containsConditionMatchingCars;
+            previousFrameContainedCars = distanceToCars.length > 0;
+
+            // ignore all other conditions
+            //const containsConditionMatchingCars = containsDangerouslyCloseCars(distanceToCars, currentSpeed);
+            //if (containsConditionMatchingCars && !previousFrameContainedCars) {
+            //    sendBrake(distanceToCars, currentSpeed, calculateBrakingDistanceFromSpeed(currentSpeed));
+            //}
+            //previousFrameContainedCars = containsConditionMatchingCars;
         }
         // Call this function again to keep predicting when the browser is ready.
         window.requestAnimationFrame(predictWebcam);
