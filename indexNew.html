@@ -65,7 +65,9 @@
     function startGPS() {
         if (!navigator.geolocation) {
             alert("geolocation not supported by your browser");
+            return;
         }
+        /*
         document.querySelector("#gps-stat").innerHTML = "enabled";
         navigator.geolocation.watchPosition(
             (position) => {
@@ -103,7 +105,7 @@
                 alert(err);
             },
             { enableHighAccuracy: true, maximumAge: 0 }
-        );
+        );*/
     }
     function getDistanceOnEarth(lat1, lon1, lat2, lon2) {
         var R = 6371; // Radius of the earth in km
@@ -248,7 +250,8 @@
             displayDistances(distanceToCars);
             
             if(distanceToCars.length > 0 && !previousFrameContainedCars){
-                sendBrake(distanceToCars, currentSpeed, calculateBrakingDistanceFromSpeed(currentSpeed));
+                //sendBrake(distanceToCars, currentSpeed, calculateBrakingDistanceFromSpeed(currentSpeed));
+                sendBrake(distanceToCars, 0, 0);
             }
             previousFrameContainedCars = distanceToCars.length > 0;
 
