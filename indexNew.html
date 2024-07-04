@@ -178,6 +178,7 @@
 <script type="module">
     const measuredFrameTime = [];
     let currentFPS = -1;
+    let prevFrameTime = performance.now();
 
     const mediapipeModelPath = `https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite`;
     const customModelPath = "/model";
@@ -271,12 +272,14 @@
     }
 
     function measureFPS(){
-        measuredFrameTime.push(performance.now());
-        if(measuredFrameTime[0] < performance.now() - 10000){
-            measuredFrameTime.shift();
-        }
-        currentFPS = measuredFrameTime.length / 10;
-        document.querySelector("#fps-value").innerHTML = currentFPS;
+        measuredFrameTime.push(performance.now() - prevFrameTime);
+        prevFrameTime = performance.now();
+
+        const references = measuredFrameTime.slice(-10);
+        let totalFrameTime = references.reduce((a, b) => a + b, 0);
+
+        currentFPS = totalFrameTime / references.length;
+        document.querySelector("#fps-value").innerHTML = currentFPS.toFixed(3);
     }
 
     function calculateDistanceFromDetections(detections) {
