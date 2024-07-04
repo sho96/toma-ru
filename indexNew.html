@@ -276,7 +276,7 @@
             measuredFrameTime.shift();
         }
         currentFPS = measuredFrameTime.length / 10;
-        document.querySelector("#fps-value").innerHTML = fps;
+        document.querySelector("#fps-value").innerHTML = currentFPS;
     }
 
     function calculateDistanceFromDetections(detections) {
