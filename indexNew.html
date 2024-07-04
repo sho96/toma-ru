@@ -30,6 +30,7 @@
     <section id="sensor-values">
         <h4><span id="speed-value">-</span> km/h</h4>
         <h4>acc: <span id="accuracy-value">-</span> m</h4>
+        <h4>fps: <span id="fps-value">-</span></h4>
     </section>
     <section id="object-detection">
         <h4 id="detection-distances">---</h4>
@@ -175,6 +176,9 @@
     }
 </script>
 <script type="module">
+    const measuredFrameTime = [];
+    const currentFPS = -1;
+
     const mediapipeModelPath = `https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite`;
     const customModelPath = "/model";
     import { ObjectDetector, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.2";
@@ -242,7 +246,7 @@
         if (video.currentTime !== lastVideoTime) {
             lastVideoTime = video.currentTime;
             const detections = objectDetector.detectForVideo(video, startTimeMs).detections;
-
+            measureFPS();
             //displayDetections(detections);
 
             const distanceToCars = calculateDistanceFromDetections(detections);
@@ -264,6 +268,15 @@
         }
         // Call this function again to keep predicting when the browser is ready.
         window.requestAnimationFrame(predictWebcam);
+    }
+
+    function measureFPS(){
+        measuredFrameTime.push(performance.now());
+        if(measuredFrameTime[0] < performance.now() - 10000){
+            measuredFrameTime.shift();
+        }
+        currentFPS = measuredFrameTime.length / 10;
+        document.querySelector("#fps-value").innerHTML = fps;
     }
 
     function calculateDistanceFromDetections(detections) {
