@@ -177,7 +177,7 @@
 </script>
 <script type="module">
     const measuredFrameTime = [];
-    const currentFPS = -1;
+    let currentFPS = -1;
 
     const mediapipeModelPath = `https://storage.googleapis.com/mediapipe-tasks/object_detector/efficientdet_lite0_uint8.tflite`;
     const customModelPath = "/model";
