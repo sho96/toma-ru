@@ -280,6 +280,10 @@
 
         currentFPS = totalFrameTime / references.length;
         document.querySelector("#fps-value").innerHTML = currentFPS.toFixed(3);
+
+        if (measuredFrameTime.length > 100){
+            measuredFrameTime.shift();
+        }
     }
 
     function calculateDistanceFromDetections(detections) {
@@ -379,6 +383,12 @@
 
     document.querySelector("#delete-logs-button").addEventListener("click", () => {
         document.querySelector("#socket-logs").innerHTML = "";
+    });
+
+    window.addEventListener("keydown", e => {
+        if (e.key == "Enter"){
+            alert(measuredFrameTime);
+        }
     });
 </script>
 <style>
