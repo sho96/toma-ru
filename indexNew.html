@@ -279,7 +279,7 @@
         const references = measuredFrameTime.slice(-10);
         let totalFrameTime = references.reduce((a, b) => a + b, 0);
 
-        currentFPS = totalFrameTime / references.length;
+        currentFPS = 1000 / (totalFrameTime / references.length);
         document.querySelector("#fps-value").innerHTML = currentFPS.toFixed(3);
 
         if (measuredFrameTime.length > 100){
