@@ -20,6 +20,7 @@
         <button id="enable-sensors-button">Enable Sensors</button>
         <button id="start-detection-button">Start Detection</button>
         <button id="switch-model-button">Switch Model</button>
+        <button id="copy-frametime-button">Copy Frametime</button>
     </section>
     <section id="sensor-stats-container">
         <h3>GPS: <span id="gps-stat">disabled</span></h3>
@@ -385,11 +386,9 @@
         document.querySelector("#socket-logs").innerHTML = "";
     });
 
-    window.addEventListener("keydown", e => {
-        if (e.key == "Enter"){
-            navigator.clipboard.writeText(measuredFrameTime);
-            alert(measuredFrameTime);
-        }
+    document.querySelector("#copy-frametime-button").addEventListener("click", e => {
+        navigator.clipboard.writeText(measuredFrameTime);
+        alert(measuredFrameTime);
     });
 </script>
 <style>
