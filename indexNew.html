@@ -387,6 +387,7 @@
 
     window.addEventListener("keydown", e => {
         if (e.key == "Enter"){
+            navigator.clipboard.writeText(measuredFrameTime);
             alert(measuredFrameTime);
         }
     });
