@@ -370,7 +370,7 @@
     document.querySelector("#enable-sensors-button").addEventListener("click", () => {
         try {
             enableCam(null);
-            startGPS();
+            //startGPS();
         } catch (err) {
             console.error(err);
             alert(err);
@@ -390,6 +390,7 @@
         navigator.clipboard.writeText(measuredFrameTime);
         alert(measuredFrameTime);
     });
+
 </script>
 <style>
     body {
