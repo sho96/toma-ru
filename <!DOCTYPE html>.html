@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock</title>
+</head>
+<body>
+    <h1></h1>
+</body>
+<script>
+    const clock = document.querySelector("h1");
+    function update(){
+        clock.innerHTML = Date.now();
+        window.requestAnimationFrame(update);
+    }
+    update();
+</script>
+<style>
+    body{
+        width: 100vw;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        font-size: xx-large;
+    }
+</style>
+</html>

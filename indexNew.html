@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js"
         crossorigin="anonymous"></script>
@@ -9,12 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Toma-ru</title>
 </head>
-
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script>
     eruda.init();
 </script>
-
 <body>
     <section id="control-buttons">
         <button id="enable-sensors-button">Enable Sensors</button>
@@ -370,7 +367,7 @@
     document.querySelector("#enable-sensors-button").addEventListener("click", () => {
         try {
             enableCam(null);
-            //startGPS();
+            startGPS();
         } catch (err) {
             console.error(err);
             alert(err);
@@ -484,5 +481,4 @@
         }
     }
 </style>
-
 </html>
