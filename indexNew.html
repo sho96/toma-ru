@@ -259,14 +259,11 @@
             
             if(distanceToCars.length > 0 && !previousFrameContainedCars){
                 sendBrake(distanceToCars, currentSpeed, calculateBrakingDistanceFromSpeed(currentSpeed));
-                measuredDetectionTime.push(performance.now() - startTimeMs);
-                if(measuredDetectionTime.length > 100){
-                    measuredDetectionTime.shift();
-                    currentDetectionTime = measuredDetectionTime.reduce((a, b) => a + b, 0) / measuredDetectionTime.length;
-                    document.querySelector("#detection-value").innerHTML = currentDetectionTime.toFixed(3);
-                }
                 //sendBrake(distanceToCars, 0, 0);
             }
+
+            addMeasuredDetectionTime(performance.now() - startTimeMs);
+
             previousFrameContainedCars = distanceToCars.length > 0;
 
             // ignore all other conditions
@@ -292,6 +289,14 @@
 
         if (measuredFrameTime.length > 100){
             measuredFrameTime.shift();
+        }
+    }
+    function addMeasuredDetectionTime(time){
+        measuredDetectionTime.push(time);
+        if(measuredDetectionTime.length > 100){
+            measuredDetectionTime.shift();
+            currentDetectionTime = measuredDetectionTime.reduce((a, b) => a + b, 0) / measuredDetectionTime.length;
+            document.querySelector("#detection-value").innerHTML = currentDetectionTime.toFixed(3);
         }
     }
 
