@@ -8,7 +8,7 @@
                 "includeFiles": [
                     "htmls/**/*",
                     "css/**/*",
-                    "routes/**/*",
+                    "model_int8_qat.tflite",
                     "images/**/*",
                     "js/**/*",
                     "index.html",
