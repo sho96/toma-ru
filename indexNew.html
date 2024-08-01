@@ -139,7 +139,7 @@
 <script>
     //websocket
     const currentHtmlUrl = window.location.href.split("/").filter((part) => part !== "")[1];
-    const ws = new WebSocket(`wss://${currentHtmlUrl}`);
+    const ws = new WebSocket(`wss://toma-ru.onrender.com`);
     //const ws = new WebSocket(`ws://${currentHtmlUrl}`);
     ws.addEventListener("open", (event) => {
         document.querySelector("#websocket-stat").innerHTML = "connected";
