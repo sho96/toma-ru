@@ -38,7 +38,7 @@ app.get("/time", (req, resp) => {
     resp.json({now: Date.now()});
 });
 app.get("/model", (request, response) => {
-    response.status(200).send(readFileSync("./model_int8_qat.tflite"));
+    response.status(200).send(readFileSync("./model.tflite"));
 })
 app.get("/health", (req, resp) => {
     resp.status(200).send("working!!");
